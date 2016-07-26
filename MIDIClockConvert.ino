@@ -13,14 +13,13 @@
 USB  Usb;
 USBH_MIDI  Midi(&Usb);
 
-byte midi_start = 0xfa;
-byte midi_stop = 0xfc;
 byte midi_clock = 0xf8;
-byte midi_continue = 0xfb;
-int play_flag = 0;
 byte data;
 
+uint8_t msg[1];
+
 void setup() {
+  msg[0] = midi_clock;
   Serial2.begin(31250); // MIDI baude rate
   
   //Workaround for non UHS2.0 Shield 
@@ -33,17 +32,13 @@ void setup() {
 }
 
 void loop() {
-  // Set up clock message
-  uint8_t msg[4];
-  msg[0] = 0xF8;
-
   // Poll USB
   Usb.Task();
 
   // If USB Host is available...
   if (Usb.getUsbTaskState() == USB_STATE_RUNNING) {
     // If Serial(x) is available...
-    if (Serial2.available() > 0) {
+    if (Serial2.available()) {
       // Read Serial(x)
       data = Serial2.read();
       
